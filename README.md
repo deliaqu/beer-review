@@ -1,4 +1,5 @@
-Before running the code, please unzip the data and the embedding:\n
+Before running the code, please unzip the data and the embedding:
+    
     -- unzip "review+wiki.filtered.200.txt.gz" to $EMBEDDING
     -- unzip "reviews.260k.train.txt.gz" to $TRAIN
     -- unzip "reviews.260k.heldout.txt.gz" to $DEV
@@ -9,6 +10,7 @@ To run the training, run the command:
     python3 training.py --train_data=$TRAIN --embedding=$EMBEDDING --dev_data=$DEV --output_prefix=$OUTPUT
     
 Other controllable parameters that can be passed in as flags include
+    
     --learning_rate
     --lambda_selection_cost
     --lambda_continuity_cost
