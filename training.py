@@ -1,4 +1,5 @@
 """Training loop for the rationale model."""
+import copy
 import gzip
 import json
 
@@ -19,7 +20,7 @@ flags.DEFINE_string('embedding', '', 'Path to the word embedding vectors.')
 flags.DEFINE_string('train_data', '', 'Path to the training set')
 flags.DEFINE_string('dev_data', '', 'Path to the development set')
 flags.DEFINE_string('output_prefix', '', 'Path prefix to output the selected rationales.')
-flags.DEFINE_float('lambda_selection_cost', 0.001,
+flags.DEFINE_float('lambda_selection_cost', 0,
                    'Regularization factor for the selection cost.')
 flags.DEFINE_float('lambda_continuity_cost', 0,
                    'Regularization factor for the continuity cost.')
@@ -30,18 +31,9 @@ flags.DEFINE_integer('hidden_dim_generator', 256, 'Hidden dimension for the'
 PADDING = '<pad>'
 
 
-def read_rationales(path):
-  """Utility function to read the rationales from path."""
-  data = []
-  fopen = gzip.open if path.endswith('.gz') else open
-  with fopen(path) as fin:
-    for line in fin:
-      item = json.loads(line)
-      data.append(item)
-  return data
-
 
 def process_data(data, nil_idx):
+  """"Pads the input data to the same length and converts to tensor."""
   maxlen = max(len(x) for x in data)
   results = []
   for x in data:
@@ -129,7 +121,7 @@ def run_epoch(enc, gen, optimizer, loader, device, is_train=True):
     out = torch.squeeze(x)
     predictions.append(out.tolist())
     loss = F.mse_loss(out, labels.float(), reduction='sum')
-    obj_losses.append(loss.item())
+    obj_losses.append(copy.deepcopy(loss.item()))
     loss += FLAGS.lambda_selection_cost * selection_cost
     loss += FLAGS.lambda_continuity_cost * continuity_cost
     loss.backward()
