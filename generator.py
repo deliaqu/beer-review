@@ -1,4 +1,4 @@
-"""Implementation of the encoder."""
+"""Implementation of the generator."""
 import torch
 
 
